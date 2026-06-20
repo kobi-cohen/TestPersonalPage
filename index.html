@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="he" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guy Iluz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #000510;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+        }
+
+        canvas#bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            gap: 50px;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .name {
+            font-size: clamp(2.8rem, 10vw, 6rem);
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: #fff;
+            text-shadow:
+                0 0 10px #00ffcc,
+                0 0 30px #00ffcc,
+                0 0 60px #00ccaa,
+                0 0 100px #0088ff;
+            animation: nameFlicker 4s ease-in-out infinite;
+        }
+
+        @keyframes nameFlicker {
+            0%, 100% {
+                text-shadow:
+                    0 0 10px #00ffcc,
+                    0 0 30px #00ffcc,
+                    0 0 60px #00ccaa,
+                    0 0 100px #0088ff;
+            }
+            50% {
+                text-shadow:
+                    0 0 20px #00ffee,
+                    0 0 50px #00ffee,
+                    0 0 100px #00aaff,
+                    0 0 160px #0055ff;
+            }
+        }
+
+        .subtitle {
+            font-size: 0.65rem;
+            letter-spacing: 0.5em;
+            color: #00ffcc55;
+            text-transform: uppercase;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 17px 30px;
+            border-radius: 60px;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            user-select: none;
+            border: none;
+        }
+
+        .btn:active { transform: scale(0.96) !important; }
+
+        /* Phone */
+        .btn-phone {
+            background: linear-gradient(135deg, #00e5ff 0%, #00b4d8 60%, #0096c7 100%);
+            color: #001a26;
+            box-shadow: 0 0 22px #00e5ff55, 0 4px 18px #00b4d840,
+                        inset 0 1px 0 #ffffff50;
+        }
+        .btn-phone:hover {
+            box-shadow: 0 0 40px #00e5ffaa, 0 8px 30px #00b4d870,
+                        inset 0 1px 0 #ffffff50;
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        /* Instagram */
+        .btn-instagram {
+            background: linear-gradient(135deg,
+                #f09433 0%, #e6683c 20%, #dc2743 45%, #cc2366 75%, #bc1888 100%);
+            color: #fff;
+            box-shadow: 0 0 22px #dc274355, 0 4px 18px #cc236640,
+                        inset 0 1px 0 #ffffff30;
+        }
+        .btn-instagram:hover {
+            box-shadow: 0 0 40px #dc2743aa, 0 8px 30px #cc236670,
+                        inset 0 1px 0 #ffffff30;
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        /* TikTok */
+        .btn-tiktok {
+            background: linear-gradient(135deg, #010101 0%, #1a1a2e 60%, #16213e 100%);
+            color: #fff;
+            border: 2px solid #69c9d0;
+            box-shadow: 0 0 22px #69c9d055, 0 4px 18px #ee116640,
+                        inset 0 1px 0 #ffffff15;
+        }
+        .btn-tiktok:hover {
+            box-shadow: 0 0 40px #69c9d0aa, 0 8px 30px #ee116670,
+                        inset 0 1px 0 #ffffff15;
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .btn-icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Smoke */
+        .smoke {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+            animation: smokeRise var(--dur, 2s) ease-out forwards;
+        }
+
+        @keyframes smokeRise {
+            0% {
+                opacity: 0.75;
+                transform: translateY(0) translateX(0) scale(0.25);
+                filter: blur(3px);
+            }
+            60% {
+                opacity: 0.35;
+                transform: translateY(var(--dy)) translateX(var(--dx)) scale(1.1);
+                filter: blur(9px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(var(--dy2)) translateX(var(--dx2)) scale(2);
+                filter: blur(16px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+    <div class="header">
+        <h1 class="name">GUY ILUZ</h1>
+        <p class="subtitle">✦ &nbsp; links &nbsp; ✦</p>
+    </div>
+
+    <div class="links">
+
+        <a href="tel:0507747988" class="btn btn-phone">
+            <span class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                    <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2
+                             1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1
+                             C9.6 21 2 13.4 2 5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1
+                             0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+                </svg>
+            </span>
+            <span>050-7747988</span>
+        </a>
+
+        <a href="https://www.instagram.com/guy_iluz1?igsh=NzRrbWs4bnEyY2tq" class="btn btn-instagram" target="_blank" rel="noopener">
+            <span class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07
+                             3.252.148 4.771 1.691 4.919 4.919
+                             .058 1.265.069 1.645.069 4.849
+                             0 3.205-.012 3.584-.069 4.849
+                             -.149 3.225-1.664 4.771-4.919 4.919
+                             -1.266.058-1.644.07-4.85.07
+                             -3.204 0-3.584-.012-4.849-.07
+                             -3.26-.149-4.771-1.699-4.919-4.92
+                             -.058-1.265-.07-1.644-.07-4.849
+                             0-3.204.013-3.583.07-4.849
+                             .149-3.227 1.664-4.771 4.919-4.919
+                             1.266-.057 1.645-.069 4.849-.069z
+                             m0-2.163c-3.259 0-3.667.014-4.947.072
+                             -4.358.2-6.78 2.618-6.98 6.98
+                             -.059 1.281-.073 1.689-.073 4.948
+                             0 3.259.014 3.668.072 4.948
+                             .2 4.358 2.618 6.78 6.98 6.98
+                             1.281.058 1.689.072 4.948.072
+                             3.259 0 3.668-.014 4.948-.072
+                             4.354-.2 6.782-2.618 6.979-6.98
+                             .059-1.28.073-1.689.073-4.948
+                             0-3.259-.014-3.667-.072-4.947
+                             -.196-4.354-2.617-6.78-6.979-6.98
+                             -1.281-.059-1.69-.073-4.949-.073z
+                             m0 5.838c-3.403 0-6.162 2.759-6.162 6.162
+                             s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163
+                             c0-3.403-2.759-6.162-6.162-6.162z
+                             m0 10.162c-2.209 0-4-1.79-4-4
+                             0-2.209 1.791-4 4-4s4 1.791 4 4
+                             c0 2.21-1.791 4-4 4z
+                             m6.406-11.845c-.796 0-1.441.645-1.441 1.44
+                             s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44
+                             s-.644-1.44-1.439-1.44z"/>
+                </svg>
+            </span>
+            <span>Instagram</span>
+        </a>
+
+        <a href="https://www.tiktok.com/" class="btn btn-tiktok" target="_blank" rel="noopener">
+            <span class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67
+                             a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89
+                             2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01
+                             a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34
+                             6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34
+                             V8.69a8.18 8.18 0 0 0 4.78 1.53V6.78
+                             a4.85 4.85 0 0 1-1.01-.09z"/>
+                </svg>
+            </span>
+            <span>TikTok</span>
+        </a>
+
+    </div>
+</div>
+
+<script>
+// ── SPACE CANVAS BACKGROUND ──────────────────────────────────────
+const canvas = document.getElementById('bg');
+const ctx    = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick  = arr  => arr[Math.floor(Math.random() * arr.length)];
+
+// Stars
+const STAR_COLORS = ['#ffffff', '#00ffcc', '#0088ff', '#00ddaa', '#aaddff', '#55ffee'];
+const stars = Array.from({ length: 220 }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    r: rand(0.3, 1.8),
+    speed: rand(0.00008, 0.0003),
+    phase: rand(0, Math.PI * 2),
+    phaseSpeed: rand(0.015, 0.05),
+    color: pick(STAR_COLORS),
+}));
+
+// Floating space symbols
+const SYMBOLS = ['✦','★','☽','✧','⊕','♦','✺','◈','⬡','⟡','✴','⭑'];
+const SYM_COLORS = ['#00ffcc', '#00aaff', '#00ddaa', '#55aaff', '#00ffaa', '#33ddff'];
+const symbols = Array.from({ length: 14 }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    char: pick(SYMBOLS),
+    size: rand(10, 24),
+    opacity: rand(0.08, 0.28),
+    speedY: rand(0.00006, 0.00022) * (Math.random() > 0.5 ? 1 : -1),
+    speedX: rand(0, 0.00008) * (Math.random() > 0.5 ? 1 : -1),
+    color: pick(SYM_COLORS),
+    phase: rand(0, Math.PI * 2),
+    phaseSpeed: rand(0.005, 0.018),
+}));
+
+// Nebula blobs
+const NEB_COLORS = ['#00ffcc', '#0088ff', '#00aadd', '#00ddaa', '#0055bb'];
+const nebulae = Array.from({ length: 7 }, () => ({
+    x: Math.random(),
+    y: Math.random(),
+    rx: rand(0.18, 0.38),
+    ry: rand(0.10, 0.22),
+    color: pick(NEB_COLORS),
+    opacity: rand(0.025, 0.07),
+    vx: rand(0.00002, 0.00006) * (Math.random() > 0.5 ? 1 : -1),
+    vy: rand(0.000015, 0.00004) * (Math.random() > 0.5 ? 1 : -1),
+}));
+
+// Shooting stars
+let shooters = [];
+function spawnShooter() {
+    shooters.push({
+        x: rand(0.05, 0.7),
+        y: rand(0.0, 0.45),
+        angle: Math.PI / 4 + rand(-0.25, 0.25),
+        travelPx: rand(80, 180),
+        speed: rand(3, 7),
+        progress: 0,
+        tail: rand(40, 90),
+    });
+}
+setInterval(spawnShooter, rand(2500, 5000));
+
+function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Background gradient
+    const bg = ctx.createRadialGradient(W * .5, H * .4, 0, W * .5, H * .4, W * .9);
+    bg.addColorStop(0,   '#001b22');
+    bg.addColorStop(0.5, '#000d18');
+    bg.addColorStop(1,   '#000510');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Nebulae
+    nebulae.forEach(n => {
+        n.x = (n.x + n.vx + 1.3) % 1.3 - 0.15;
+        n.y = (n.y + n.vy + 1.2) % 1.2 - 0.1;
+        const g = ctx.createRadialGradient(n.x*W, n.y*H, 0, n.x*W, n.y*H, n.rx*W);
+        const hex = Math.floor(n.opacity * 255).toString(16).padStart(2,'0');
+        g.addColorStop(0, n.color + hex);
+        g.addColorStop(1, n.color + '00');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(n.x*W, n.y*H, n.rx*W, n.ry*H, 0, 0, Math.PI*2);
+        ctx.fill();
+    });
+
+    // Stars
+    stars.forEach(s => {
+        s.phase += s.phaseSpeed;
+        s.y = (s.y + s.speed + 1) % 1;
+        const alpha = 0.45 + 0.55 * Math.abs(Math.sin(s.phase));
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+        ctx.fill();
+        if (s.r > 1.3) {
+            const g2 = ctx.createRadialGradient(s.x*W, s.y*H, 0, s.x*W, s.y*H, s.r*5);
+            g2.addColorStop(0, s.color + '55');
+            g2.addColorStop(1, s.color + '00');
+            ctx.beginPath();
+            ctx.arc(s.x*W, s.y*H, s.r*5, 0, Math.PI*2);
+            ctx.fillStyle = g2;
+            ctx.fill();
+        }
+    });
+
+    // Space symbols
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    symbols.forEach(sym => {
+        sym.x = (sym.x + sym.speedX + 1.1) % 1.1;
+        sym.y = (sym.y + sym.speedY + 1.1) % 1.1;
+        sym.phase += sym.phaseSpeed;
+        const a = sym.opacity * (0.55 + 0.45 * Math.sin(sym.phase));
+        ctx.globalAlpha = a;
+        ctx.fillStyle = sym.color;
+        ctx.font = `${sym.size}px serif`;
+        ctx.fillText(sym.char, sym.x*W, sym.y*H);
+    });
+
+    // Shooting stars
+    shooters = shooters.filter(s => s.progress < s.travelPx);
+    shooters.forEach(s => {
+        s.progress += s.speed;
+        const cx  = s.x*W + Math.cos(s.angle) * s.progress;
+        const cy  = s.y*H + Math.sin(s.angle) * s.progress;
+        const tx  = cx - Math.cos(s.angle) * s.tail;
+        const ty  = cy - Math.sin(s.angle) * s.tail;
+        const pct = s.progress / s.travelPx;
+        ctx.globalAlpha = (1 - pct) * 0.9;
+        const gr = ctx.createLinearGradient(tx, ty, cx, cy);
+        gr.addColorStop(0, 'transparent');
+        gr.addColorStop(1, '#ccffff');
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(cx, cy);
+        ctx.strokeStyle = gr;
+        ctx.lineWidth   = 1.5;
+        ctx.stroke();
+    });
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+}
+draw();
+
+// ── SMOKE PARTICLES ──────────────────────────────────────────────
+const SMOKE = {
+    'btn-phone':     ['#00e5ff', '#00b4d8', '#90e0ef', '#caf0f8'],
+    'btn-instagram': ['#f09433', '#dc2743', '#cc2366', '#ff6b9d'],
+    'btn-tiktok':    ['#69c9d0', '#ee1166', '#ffffff', '#aaeeff'],
+};
+
+function emitSmoke(btn) {
+    const rect   = btn.getBoundingClientRect();
+    const cls    = [...btn.classList].find(c => SMOKE[c]);
+    const colors = SMOKE[cls] || ['#ffffff'];
+    const n      = Math.random() < 0.4 ? 2 : 1;
+
+    for (let i = 0; i < n; i++) {
+        const el   = document.createElement('div');
+        el.className = 'smoke';
+        const size = rand(12, 32);
+        const color= pick(colors);
+        const x    = rect.left + rand(rect.width * 0.15, rect.width * 0.85);
+        const y    = rect.top  + rand(rect.height * 0.2, rect.height * 0.8);
+        const dy   = -rand(45, 100);
+        const dx   = rand(-35, 35);
+        const dur  = rand(1.4, 2.8);
+
+        el.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${x - size/2}px; top:${y - size/2}px;
+            background:${color};
+            --dy:${dy}px; --dx:${dx}px;
+            --dy2:${dy * 1.9}px; --dx2:${dx * 1.6}px;
+            --dur:${dur}s;
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), (dur + 0.1) * 1000);
+    }
+}
+
+document.querySelectorAll('.btn').forEach(btn => {
+    (function loop() {
+        emitSmoke(btn);
+        setTimeout(loop, rand(400, 2800));
+    })();
+});
+</script>
+</body>
+</html>
